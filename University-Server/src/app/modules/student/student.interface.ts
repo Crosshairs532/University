@@ -16,7 +16,6 @@ export type TLocalGuardian = {
   address: string;
 };
 export type TStudent = {
-  id: String;
   userId: Types.ObjectId;
   name: String;
   gender: "MALE" | "FEMALE";

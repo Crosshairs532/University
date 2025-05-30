@@ -1,5 +1,7 @@
 import express from "express";
+import { studentController } from "./student.controller";
 
 const studentRoutes = express.Router();
 
-studentRoutes.post("/create-student");
+studentRoutes.get("/", studentController.getAllStudents);
+export default studentRoutes;

@@ -1,3 +1,5 @@
+import { Model } from "mongoose";
+
 export type TUser = {
   id: string;
   password: string;
@@ -8,3 +10,6 @@ export type TUser = {
   createdAt: Date;
   updatedAt: Date;
 };
+// interface UserModelType extends Model<TUser> {
+
+// }

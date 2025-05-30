@@ -1,18 +1,26 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { userService } from "./user.service";
+import { SendResponse } from "../../utils/SendResponse";
 
-const createStudent = async (req: Request, res: Response) => {
-  const { password, student } = req.body;
+const createStudent = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const { password, student } = req?.body;
+
+  console.log(password, student);
 
   try {
     const user = await userService.createStudentDB(password, student);
-    res.status(200).send({
+
+    SendResponse(res, {
       success: true,
       data: user,
       message: "Student created successfully",
     });
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };
 

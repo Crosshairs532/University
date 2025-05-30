@@ -17,9 +17,8 @@ const LocalGuardianSchema = new Schema({
   address: { type: String, required: true },
 });
 
-const StudentSchema = new Schema(
+const StudentSchema = new Schema<TStudent>(
   {
-    id: { type: String, required: true, unique: true },
     userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
     name: { type: String, required: true },
     gender: { type: String, enum: ["MALE", "FEMALE"], required: true },
