@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response } from "express";
+import { Request, Response } from "express";
 
 export const globalErrorHandler = (err: any, req: Request, res: Response) => {
   let statusCode = 200;
