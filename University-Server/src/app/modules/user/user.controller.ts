@@ -1,12 +1,8 @@
-import { NextFunction, Request, Response } from "express";
 import { userService } from "./user.service";
 import { SendResponse } from "../../utils/SendResponse";
+import catchAsync from "../../utils/catchAsynch";
 
-const createStudent = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+const createStudent = catchAsync(async (req, res, next) => {
   const { password, student } = req?.body;
 
   console.log(password, student);
@@ -22,6 +18,5 @@ const createStudent = async (
   } catch (error) {
     next(error);
   }
-};
-
+});
 export const userController = { createStudent };
