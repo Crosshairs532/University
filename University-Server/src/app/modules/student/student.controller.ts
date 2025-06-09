@@ -3,17 +3,13 @@ import { SendResponse } from "../../utils/SendResponse";
 import catchAsync from "../../utils/catchAsynch";
 
 const getAllStudents = catchAsync(async (req, res, next) => {
-  try {
-    const allStudents = await studentService.getAllStudentsDB();
+  const allStudents = await studentService.getAllStudentsDB();
 
-    SendResponse(res, {
-      success: true,
-      message: "Students fetched successfully",
-      data: allStudents,
-    });
-  } catch (error) {
-    next(error);
-  }
+  SendResponse(res, {
+    success: true,
+    message: "Students fetched successfully",
+    data: allStudents,
+  });
 });
 
 const getSingleStudent = catchAsync(async (req, res, next) => {

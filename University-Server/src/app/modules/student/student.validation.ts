@@ -32,7 +32,7 @@ const createStudentValidationSchema = z.object({
     student: z.object({
       name: userNameValidationSchema,
       gender: z.enum(["MALE", "FEMALE"]),
-      dateOfBirth: z.string().datetime(),
+      dateOfBirth: z.date().optional(),
       email: z.string().email(),
       contactNo: z.string(),
       bloodGroup: z.enum(["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"]),
