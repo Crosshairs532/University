@@ -15,7 +15,7 @@ const CreateAcademicSemesterValidationSchema = z.object({
       required_error: "Semester Code is required",
       invalid_type_error: "Semester Code is invalid",
     }),
-    year: z.string().date(),
+    year: z.string(),
     startMonth: z.enum(Months as [string, ...string[]]),
     endMonth: z.enum(Months as [string, ...string[]]),
   }),

@@ -7,10 +7,19 @@ const router = Router();
 
 router.post(
   "/create-academic-semester",
-  schemaValidation(
-    AcademicSemesterValidationSchema.CreateAcademicSemesterValidationSchema
-  ),
+  // schemaValidation(
+  //   AcademicSemesterValidationSchema.CreateAcademicSemesterValidationSchema
+  // ),
   AcademicSemesterController.createAcademicSemester
+);
+
+router.get(
+  "/all-academic-semester",
+  AcademicSemesterController.getAllAcademicSemester
+);
+router.get(
+  "/:singleSemesterId",
+  AcademicSemesterController.getSingleAcademicSemester
 );
 
 export const AcademicSemesterRouter = router;
