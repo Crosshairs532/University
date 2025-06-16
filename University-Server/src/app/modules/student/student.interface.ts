@@ -22,6 +22,7 @@ export type TUserName = {
 };
 
 export type TStudent = {
+  id: String;
   userId: Types.ObjectId;
   name: TUserName;
   gender: "MALE" | "FEMALE";

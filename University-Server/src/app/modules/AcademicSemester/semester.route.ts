@@ -7,9 +7,9 @@ const router = Router();
 
 router.post(
   "/create-academic-semester",
-  // schemaValidation(
-  //   AcademicSemesterValidationSchema.CreateAcademicSemesterValidationSchema
-  // ),
+  schemaValidation(
+    AcademicSemesterValidationSchema.CreateAcademicSemesterValidationSchema
+  ),
   AcademicSemesterController.createAcademicSemester
 );
 

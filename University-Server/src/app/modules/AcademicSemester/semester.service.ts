@@ -1,7 +1,7 @@
 import { TAcademicSemester } from "./semester.interface";
 import { AcademicSemester } from "./semester.model";
 
-const createAcademicSemester = (payload: any) => {
+const createAcademicSemester = async (payload: any) => {
   const AcademicSemesterCode: { [key: string]: string } = {
     Spring: "01",
     Summer: "02",
@@ -11,7 +11,7 @@ const createAcademicSemester = (payload: any) => {
   if (AcademicSemesterCode[payload.name] !== payload.code) {
     throw new Error("Semester Code invalid!");
   }
-  const result = AcademicSemester.create(payload);
+  const result = await AcademicSemester.create(payload);
   return result;
 };
 

@@ -3,7 +3,6 @@ import express from "express";
 import cors from "cors";
 import notFound from "./app/middlewares/not-found";
 import { globalErrorHandler } from "./app/middlewares/GlobalHandler";
-
 import router from "./app/routes";
 const app = express();
 app.use(express.json());

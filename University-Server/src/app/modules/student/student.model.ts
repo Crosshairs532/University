@@ -20,6 +20,9 @@ const LocalGuardianSchema = new Schema({
 const StudentSchema = new Schema<TStudent>(
   {
     userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
+    id: {
+      type: String,
+    },
     name: { type: String, required: true },
     gender: { type: String, enum: ["MALE", "FEMALE"], required: true },
     dateOfBirth: { type: Date, required: true },

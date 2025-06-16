@@ -8,16 +8,16 @@ const userNameValidationSchema = z.object({
     .refine((value) => /^[A-Z]/.test(value), {
       message: "First Name must start with a capital letter",
     }),
-  middleName: z.string(),
+  middleName: z.string().optional(),
   lastName: z.string(),
 });
 const guardianSchema = z.object({
   fatherName: z.string(),
   fatherOccupation: z.string(),
-  fatherContactNumber: z.string(),
+  fatherContactNo: z.string(),
   motherName: z.string(),
   motherOccupation: z.string(),
-  motherContactNumber: z.string(),
+  motherContactNo: z.string(),
 });
 
 const localGuardianSchema = z.object({
@@ -30,9 +30,9 @@ const createStudentValidationSchema = z.object({
   body: z.object({
     password: z.string().min(6, "Password must be at least 6 characters long"),
     student: z.object({
-      name: userNameValidationSchema,
+      name: z.string(),
       gender: z.enum(["MALE", "FEMALE"]),
-      dateOfBirth: z.date().optional(),
+      dateOfBirth: z.string().optional(),
       email: z.string().email(),
       contactNo: z.string(),
       bloodGroup: z.enum(["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"]),
@@ -41,7 +41,7 @@ const createStudentValidationSchema = z.object({
       permanentAddress: z.string(),
       guardian: guardianSchema,
       localGuardian: localGuardianSchema,
-      profileImage: z.string(),
+      profileImage: z.string().optional(),
       admissionSemester: z.string(),
     }),
   }),
