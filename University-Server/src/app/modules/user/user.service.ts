@@ -5,6 +5,9 @@ import { TUser } from "./user.interface";
 
 import { userModel } from "./user.model";
 import { TAcademicSemester } from "../AcademicSemester/semester.interface";
+import { generateStudentId } from "../../utils/generateStudentId";
+import mongoose from "mongoose";
+import AppError from "../../utils/AppError";
 
 const createStudentDB = async (password: string, studentData: any) => {
   const user: Partial<TUser> = {};
@@ -16,60 +19,31 @@ const createStudentDB = async (password: string, studentData: any) => {
     studentData.admissionSemester
   );
 
-  const findLastStudent = async () => {
-    const lastStudent = await userModel
-      .findOne({
-        role: "student",
-      })
-      .select({
-        id: 1,
-        _id: 0,
-      })
-      .sort({
-        createdAt: -1,
-      }).lean;
+  const session = await mongoose.startSession();
 
-    return lastStudent?.id ? lastStudent.id : undefined;
-  };
-
-  const generateStudentId = async (academicSemester: TAcademicSemester) => {
-    let currentId = (0).toString(); // 0000 by default
-
-    const lastStudentId = await findLastStudent();
-    // 2030 01 0001
-
-    if (lastStudentId) {
-      const lastStudentSemesterYear = lastStudentId.substring(0, 4);
-      const lastStudentSemesterCode = lastStudentId.substring(4, 6);
-      const currentSemesterCode = academicSemester.code;
-      const currentYear = academicSemester.year;
-      if (
-        lastStudentSemesterCode == currentSemesterCode &&
-        lastStudentSemesterYear == currentYear
-      ) {
-        currentId = lastStudentId.substring(6); // 0001
-      }
-    }
-
-    const incrementId = (Number(currentId) + 1).toString().padStart(4, "0");
-
-    const newID = `${academicSemester.year}${academicSemester.code}${incrementId}`;
-    return newID;
-  };
-
-  user.id = (await generateStudentId(academicSemester!)) as string;
   try {
-    const result = await userModel.create(user);
+    session.startTransaction();
+    user.id = (await generateStudentId(academicSemester!)) as string;
+    const result = await userModel.create([user], { session });
     // create student
-    if (result) {
-      studentData.userId = result._id;
-      studentData.id = result.id;
-      const student = await studentModel.create(studentData);
-      return student;
+    if (!result.length) {
+      throw new AppError(500, "Failed to create user");
     }
+    studentData.userId = result[0]._id;
+    studentData.id = result[0].id;
+    const student = await studentModel.create([studentData], { session });
+
+    if (!student) {
+      throw new AppError(500, "Failed to create Student");
+    }
+    await session.commitTransaction();
+    await session.endSession();
+    return student;
   } catch (error) {
-    console.error("Error creating student:", error);
-    throw new Error("Failed to create student");
+    await session.abortTransaction();
+    await session.endSession();
+    // console.error("Error creating student:", error);
+    // throw new Error("Failed to create student");
   }
 };
 
