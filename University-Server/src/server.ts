@@ -15,3 +15,19 @@ async function main() {
     console.log(`University server is listening on port ${port}`);
   });
 }
+// for asynchronous  behavior
+process.on("unhandledRejection", (reason, promise) => {
+  console.log(`UnhandledRejection is detected, shutting down server....`);
+  if (server) {
+    server.close(() => {
+      process.exit(1);
+    });
+  }
+  process.exit(1);
+});
+//  for synchronous behavior
+process.on("uncaughtException", (err) => {
+  console.log(`UnCaughtRejection is detected, shutting down server....`);
+  console.error(err);
+  process.exit(1);
+});
