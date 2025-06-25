@@ -26,17 +26,12 @@ class QueryBuilder<T> {
     return this;
   }
 
-  public filter(excludedFields: string[]) {
+  public filter(excludedFields?: string[]) {
     let queryObj = { ...this.query };
-    excludedFields.forEach((field: string) => {
+    excludedFields?.forEach((field: string) => {
       return delete queryObj[field];
     });
-    this.modelQuery = this.modelQuery.find(queryObj).populate({
-      path: "academicDepartment",
-      populate: {
-        path: "academicFaculty",
-      },
-    });
+    this.modelQuery = this.modelQuery.find(queryObj);
 
     return this;
   }

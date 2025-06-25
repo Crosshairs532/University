@@ -3,7 +3,7 @@ import { SendResponse } from "../../utils/SendResponse";
 import catchAsync from "../../utils/catchAsynch";
 
 const getAllStudents = catchAsync(async (req, res, next) => {
-  const allStudents = await studentService.getAllStudentsDB(req.params);
+  const allStudents = await studentService.getAllStudentsDB(req.query);
 
   SendResponse(res, {
     success: true,

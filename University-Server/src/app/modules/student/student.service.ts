@@ -7,7 +7,15 @@ import QueryBuilder from "../../builder/QueryBuilder";
 const getAllStudentsDB = async (query: Record<string, unknown>) => {
   const excludeFields = ["searchTerm", "sort", "limit", "page", "fields"];
   const searchTerms = ["email", "name.firstName", "presentAddress"];
-  const studentQuery = new QueryBuilder(studentModel.find(), query)
+  const studentQuery = new QueryBuilder(
+    studentModel.find().populate({
+      path: "academicDepartment",
+      populate: {
+        path: "academicFaculty",
+      },
+    }),
+    query
+  )
     .search(searchTerms)
     .filter(excludeFields)
     .sort()
