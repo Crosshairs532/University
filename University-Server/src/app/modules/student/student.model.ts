@@ -30,7 +30,10 @@ const StudentSchema = new Schema<TStudent>(
     contactNo: { type: String, required: true },
     bloodGroup: {
       type: String,
-      enum: ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"],
+      enum: {
+        values: ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"],
+        messsage: "{VALUE} is a valid blood type",
+      },
     },
     emergencyContactNo: { type: String, required: true },
     presentAddress: { type: String, required: true },

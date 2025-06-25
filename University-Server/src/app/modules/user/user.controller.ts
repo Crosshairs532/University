@@ -7,16 +7,24 @@ const createStudent = catchAsync(async (req, res, next) => {
 
   console.log(password, student);
 
-  try {
-    const user = await userService.createStudentDB(password, student);
+  const user = await userService.createStudentDB(password, student);
 
-    SendResponse(res, {
-      success: true,
-      data: user,
-      message: "Student created successfully",
-    });
-  } catch (error) {
-    next(error);
-  }
+  SendResponse(res, {
+    success: true,
+    data: user,
+    message: "Student created successfully",
+  });
 });
-export const userController = { createStudent };
+
+const createFaculty = catchAsync(async (req, res, next) => {
+  const { password, faculty } = req?.body;
+
+  const user = await userService.createFaculty(password, faculty);
+
+  SendResponse(res, {
+    success: true,
+    data: user,
+    message: "Faculty created successfully",
+  });
+});
+export const userController = { createStudent, createFaculty };

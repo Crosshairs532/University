@@ -2,61 +2,72 @@ import mongoose from "mongoose";
 import AppError from "../../utils/AppError";
 import { studentModel } from "./student.model";
 import { userModel } from "../user/user.model";
+import QueryBuilder from "../../builder/QueryBuilder";
 
 const getAllStudentsDB = async (query: Record<string, unknown>) => {
-  let searchTerm = "";
-  let queryObj = { ...query };
-  if (query.searchTerm) {
-    searchTerm = query?.searchTerm as string;
-  }
-
-  const searchQuery = studentModel.find({
-    $or: ["email", "name.firstName", "presentAddress"].map((item) => ({
-      [item]: { $regex: searchTerm, $options: "i" },
-    })),
-  });
-
   const excludeFields = ["searchTerm", "sort", "limit", "page", "fields"];
-  excludeFields.forEach((field) => delete queryObj[field]);
+  const searchTerms = ["email", "name.firstName", "presentAddress"];
+  const studentQuery = new QueryBuilder(studentModel.find(), query)
+    .search(searchTerms)
+    .filter(excludeFields)
+    .sort()
+    .paginate()
+    .fields();
 
-  const filterQuery = await searchQuery.find(queryObj).populate({
-    path: "academicDepartment",
-    populate: {
-      path: "academicFaculty",
-    },
-  });
+  const result = await studentQuery.modelQuery;
+  return result;
 
-  let sort = "-createdAt";
+  // if (query.searchTerm) {
+  //   searchTerm = query?.searchTerm as string;
+  // }
 
-  if (query.sort) {
-    sort = query?.sort as string;
-  }
-  const sortQuery = filterQuery.sort(sort);
+  // const searchQuery = studentModel.find({
+  //   $or: ["email", "name.firstName", "presentAddress"].map((item) => ({
+  //     [item]: { $regex: searchTerm, $options: "i" },
+  //   })),
+  // });
 
-  let limit = 10;
-  let page = 1;
-  let skip = 0;
+  // const excludeFields = ["searchTerm", "sort", "limit", "page", "fields"];
+  // excludeFields.forEach((field) => delete queryObj[field]);
+
+  // const filterQuery = await searchQuery.find(queryObj).populate({
+  //   path: "academicDepartment",
+  //   populate: {
+  //     path: "academicFaculty",
+  //   },
+  // });
+
+  // let sort = "-createdAt";
+
+  // if (query.sort) {
+  //   sort = query?.sort as string;
+  // }
+  // const sortQuery = filterQuery.sort(sort);
+
+  // let limit = 10;
+  // let page = 1;
+  // let skip = 0;
 
   // 1 -> 0, 2 -> 10 , 3 -> 20
-  if (query.limit) {
-    limit = Number(query.limit);
-  }
-  if (query.page) {
-    page = Number(query.page);
-    skip = (page - 1) * limit;
-  }
-  const paginateQuery = sortQuery.skip(skip);
-  const limitQuery = await paginateQuery.limit(limit);
+  // if (query.limit) {
+  //   limit = Number(query.limit);
+  // }
+  // if (query.page) {
+  //   page = Number(query.page);
+  //   skip = (page - 1) * limit;
+  // }
+  // const paginateQuery = sortQuery.skip(skip);
+  // const limitQuery = await paginateQuery.limit(limit);
 
-  let fields = "-_v";
+  // let fields = "-_v";
 
-  if (query.fields) {
-    const fields = (query.fields as string).split(",").join(" ");
-  }
+  // if (query.fields) {
+  //   const fields = (query.fields as string).split(",").join(" ");
+  // }
 
-  const fieldQuery = await limitQuery.select(fields);
+  // const fieldQuery = await limitQuery.select(fields);
 
-  return fieldQuery;
+  // return fieldQuery;
 
   // return allStudents;
   // } catch (error) {
