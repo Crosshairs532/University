@@ -27,6 +27,11 @@ const updateCourse = async (courseId: string, courseData: TCourse) => {
 
   return result;
 };
+const getSingleCourse = async (id: string) => {
+  const result = await courseModel.findById(id);
+  return result;
+};
+
 const deleteCourse = async (courseId: string) => {
   const result = await courseModel.findByIdAndUpdate(
     courseId,
@@ -43,4 +48,5 @@ export const courseService = {
   getAllCourse,
   updateCourse,
   deleteCourse,
+  getSingleCourse,
 };

@@ -6,6 +6,7 @@ import { courseValidationSchema } from "./course.validation";
 const courseRoutes = Router();
 
 courseRoutes.get("/get-all-course", courseController.getAllCourse);
+courseRoutes.get("/:courseId", courseController.getSingleCourse);
 courseRoutes.post(
   "/create-course",
   schemaValidation(courseValidationSchema.createCourseValidation),

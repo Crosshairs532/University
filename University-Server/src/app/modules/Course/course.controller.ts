@@ -18,6 +18,16 @@ const getAllCourse = catchAsync(async (req, res) => {
     message: "All Course retrieved",
   });
 });
+
+const getSingleCourse = catchAsync(async (req, res) => {
+  const { courseId } = req.params;
+  const result = await courseService.getSingleCourse(courseId as string);
+  SendResponse(res, {
+    data: result,
+    success: true,
+    message: "Single Course Retrieved",
+  });
+});
 const updateCourse = catchAsync(async (req, res) => {
   const { courseId } = req?.query;
   const result = await courseService.updateCourse(courseId as string, req.body);
@@ -42,4 +52,5 @@ export const courseController = {
   deleteCourse,
   updateCourse,
   getAllCourse,
+  getSingleCourse,
 };
