@@ -56,6 +56,6 @@ export const globalErrorHandler: ErrorRequestHandler = (
     success: false,
     message: message,
     errorSources,
-    // error: err,
+    error: err?.stack,
   });
 };

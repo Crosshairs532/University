@@ -16,7 +16,7 @@ const FacultySearchableFields = [
 
 const getAllFaculty = async (query: Record<string, unknown>) => {
   const result = new QueryBuilder(
-    facultyModel.find({ isDeleted: false }).populate({
+    facultyModel.find({}).populate({
       path: "academicDepartment",
       populate: {
         path: "academicFaculty",
@@ -25,7 +25,10 @@ const getAllFaculty = async (query: Record<string, unknown>) => {
     query
   )
     .search(FacultySearchableFields)
-    .filter();
+    .filter()
+    .sort()
+    .fields()
+    .paginate();
   return result;
 };
 

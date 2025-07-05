@@ -3,6 +3,7 @@ import { SendResponse } from "../../utils/SendResponse";
 import { facultyService } from "./faculty.service";
 
 const getAllFaculty = catchAsync(async (req, res, next) => {
+  console.log("get all");
   const result = await facultyService.getAllFaculty(req.query);
   SendResponse(res, {
     success: true,

@@ -8,9 +8,9 @@ class QueryBuilder<T> {
     this.query = query;
   }
   public search(searchableFields: string[]) {
-    let searchTerm = "";
+    let searchTerm = this?.query?.searchTerm;
 
-    if (this?.query?.searchTerm) {
+    if (searchTerm) {
       const searchQuery = searchableFields.map(
         (item) =>
           ({
@@ -27,7 +27,7 @@ class QueryBuilder<T> {
   }
 
   public filter(excludedFields?: string[]) {
-    let queryObj = { ...this.query };
+    let queryObj = { ...this?.query };
     excludedFields?.forEach((field: string) => {
       return delete queryObj[field];
     });
@@ -37,15 +37,18 @@ class QueryBuilder<T> {
   }
 
   public sort() {
-    let sort = (this.query.sort as string).split(",").join(" ") || "-createdAt";
+    const sortFields =
+      this.query.sort && (this?.query?.sort as string).split(",").join(" ");
+    console.log(sortFields);
+    let sort = sortFields ? sortFields : "-createdAt";
 
-    this.modelQuery = this.modelQuery.sort(sort);
+    this.modelQuery = this.modelQuery.sort(sort as string);
     return this;
   }
 
   public paginate() {
-    const skip = Number(this.query.skip) || 0;
-    const page = Number(this.query.page) || 1;
+    // const skip = Number(this?.query?.skip) || 0;
+    const page = Number(this?.query?.page) || 1;
     const limit = 10;
     const skip_ = (page - 1) * limit;
     this.modelQuery = this.modelQuery.skip(skip_).limit(limit);
@@ -54,10 +57,13 @@ class QueryBuilder<T> {
   }
 
   public fields() {
-    let fields = (this.query.fields as string).split(",").join(" ");
-    ("-_v");
+    const fieldsValues =
+      this?.query?.fields &&
+      (this?.query?.fields as string).split(",").join(" ");
 
-    this.modelQuery = this.modelQuery.select(fields);
+    let fields = fieldsValues ? fieldsValues : "-__v";
+
+    this.modelQuery = this.modelQuery.select(fields as string);
     return this;
   }
 }
