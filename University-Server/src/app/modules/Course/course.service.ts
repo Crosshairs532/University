@@ -21,10 +21,58 @@ const getAllCourse = async (query: Record<string, unknown>) => {
   return result?.modelQuery;
 };
 const updateCourse = async (courseId: string, courseData: TCourse) => {
-  const result = await courseModel.findByIdAndUpdate(courseId, courseData, {
-    new: true,
-  });
+  const { preRequisiteCourses, ...basicCourseInformation } = courseData;
 
+  const updateBasicInformation = await courseModel.findByIdAndUpdate(
+    courseId,
+    basicCourseInformation,
+    {
+      new: true,
+      runValidators: true,
+    }
+  );
+
+  if (preRequisiteCourses && preRequisiteCourses.length > 0) {
+    const deletePrePrerequisites = preRequisiteCourses
+      .filter((id) => id.courseId && id.isDeleted)
+      .map((id) => id.courseId);
+    const deletedPreRequisiteCourses = await courseModel.findByIdAndUpdate(
+      courseId,
+      {
+        $pull: {
+          preRequisiteCourses: {
+            courseId: {
+              $in: [deletePrePrerequisites],
+            },
+          },
+        },
+      },
+      {
+        new: true,
+      }
+    );
+    const updateNewPreRequisiteCourses = preRequisiteCourses.filter(
+      (id) => id.courseId && !id.isDeleted
+    );
+
+    const newUpdated = await courseModel.findByIdAndUpdate(
+      { _id: courseId },
+      {
+        $addToSet: {
+          preRequisiteCourses: {
+            $each: updateNewPreRequisiteCourses,
+          },
+        },
+      },
+      {
+        new: true,
+      }
+    );
+  }
+
+  const result = await courseModel
+    .findById(courseId)
+    .populate("preRequisiteCourses.courseId");
   return result;
 };
 const getSingleCourse = async (id: string) => {

@@ -5,6 +5,7 @@ import { boolean, number } from "zod";
 const preRequisiteCourse = new Schema<preRequisiteCourse>({
   courseId: {
     type: Schema.Types.ObjectId,
+    ref: "course",
   },
   isDeleted: {
     type: Boolean,

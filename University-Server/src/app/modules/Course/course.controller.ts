@@ -29,7 +29,7 @@ const getSingleCourse = catchAsync(async (req, res) => {
   });
 });
 const updateCourse = catchAsync(async (req, res) => {
-  const { courseId } = req?.query;
+  const { courseId } = req?.params;
   const result = await courseService.updateCourse(courseId as string, req.body);
   SendResponse(res, {
     data: result,
