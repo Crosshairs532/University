@@ -19,6 +19,28 @@ const createSemesterRegistration = async (payload: TSemesterRegistration) => {
     throw new AppError(status.CONFLICT, "This Semester already exists");
   }
 
+  // check if there is any upcoming or ongoing semester
+
+  const isUpcomingOrOngoing = await semesterRegistrationModel.findOne({
+    status: {
+      $or: [
+        {
+          status: "UPCOMING",
+        },
+        {
+          status: "ONGOING",
+        },
+      ],
+    },
+  });
+
+  if (isUpcomingOrOngoing) {
+    throw new AppError(
+      status.BAD_REQUEST,
+      `There is already a ${isUpcomingOrOngoing.status} semester`
+    );
+  }
+
   const result = await semesterRegistrationModel.create(payload);
 
   return result;
@@ -43,7 +65,50 @@ const singleRegisteredSemester = async (id: string) => {
 
   return result;
 };
-const updateSemesterRegistration = async () => {};
+const updateSemesterRegistration = async (
+  id: string,
+  payload: Partial<TSemesterRegistration>
+) => {
+  const registeredSemester = await semesterRegistrationModel.findById(id);
+
+  if (!registeredSemester) {
+    throw new AppError(
+      status.BAD_REQUEST,
+      "Requested Semester Does not exist!"
+    );
+  }
+  if (
+    // registeredSemester.status == "ONGOING" ||
+    registeredSemester.status == "ENDED"
+  ) {
+    throw new AppError(
+      status.BAD_REQUEST,
+      `Already this semester is ${registeredSemester.status}`
+    );
+  }
+  if (registeredSemester.status == "ONGOING" && payload.status == "UPCOMING") {
+    throw new AppError(
+      status.BAD_REQUEST,
+      `You can not directly update ${registeredSemester} to ${payload.status}`
+    );
+  }
+  if (registeredSemester.status == "UPCOMING" && payload.status == "ENDED") {
+    throw new AppError(
+      status.BAD_REQUEST,
+      `You can not directly update ${registeredSemester} to ${payload.status}`
+    );
+  }
+
+  const result = await semesterRegistrationModel.findByIdAndUpdate(
+    id,
+    payload,
+    {
+      new: true,
+    }
+  );
+
+  return result;
+};
 
 export const semesterRegistrationService = {
   createSemesterRegistration,

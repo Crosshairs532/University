@@ -21,4 +21,9 @@ semesterRegistrationRoutes.get(
   "/:registeredSemesterId",
   semesterRegistrationController.singleRegisteredSemester
 );
+semesterRegistrationRoutes.patch(
+  "/:registeredSemesterId",
+  semesterRegistrationController.updateRegisteredSemester
+);
+
 export default semesterRegistrationRoutes;
