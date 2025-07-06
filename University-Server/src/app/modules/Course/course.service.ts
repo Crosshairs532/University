@@ -1,7 +1,9 @@
+import { startSession } from "mongoose";
 import QueryBuilder from "../../builder/QueryBuilder";
 import { searchableFields } from "./course.constant";
-import { TCourse } from "./course.interface";
-import { courseModel } from "./course.model";
+import { TCourse, TCourseFaculty } from "./course.interface";
+import { courseFacultyModel, courseModel } from "./course.model";
+import path from "path";
 
 const createCourse = async (courseData: TCourse) => {
   const result = await courseModel.create(courseData);
@@ -23,57 +25,70 @@ const getAllCourse = async (query: Record<string, unknown>) => {
 const updateCourse = async (courseId: string, courseData: TCourse) => {
   const { preRequisiteCourses, ...basicCourseInformation } = courseData;
 
-  const updateBasicInformation = await courseModel.findByIdAndUpdate(
-    courseId,
-    basicCourseInformation,
-    {
-      new: true,
-      runValidators: true,
-    }
-  );
+  // create transaction session
 
-  if (preRequisiteCourses && preRequisiteCourses.length > 0) {
-    const deletePrePrerequisites = preRequisiteCourses
-      .filter((id) => id.courseId && id.isDeleted)
-      .map((id) => id.courseId);
-    const deletedPreRequisiteCourses = await courseModel.findByIdAndUpdate(
+  const session = await startSession();
+
+  try {
+    session.startTransaction();
+    const updateBasicInformation = await courseModel.findByIdAndUpdate(
       courseId,
+      basicCourseInformation,
       {
-        $pull: {
-          preRequisiteCourses: {
-            courseId: {
-              $in: [deletePrePrerequisites],
+        new: true,
+        runValidators: true,
+        session: session,
+      }
+    );
+
+    if (preRequisiteCourses && preRequisiteCourses.length > 0) {
+      const deletePrePrerequisites = preRequisiteCourses
+        .filter((id) => id.courseId && id.isDeleted)
+        .map((id) => id.courseId);
+      const deletedPreRequisiteCourses = await courseModel.findByIdAndUpdate(
+        courseId,
+        {
+          $pull: {
+            preRequisiteCourses: {
+              courseId: {
+                $in: [deletePrePrerequisites],
+              },
             },
           },
         },
-      },
-      {
-        new: true,
-      }
-    );
-    const updateNewPreRequisiteCourses = preRequisiteCourses.filter(
-      (id) => id.courseId && !id.isDeleted
-    );
+        {
+          new: true,
+          session: session,
+        }
+      );
+      const updateNewPreRequisiteCourses = preRequisiteCourses.filter(
+        (id) => id.courseId && !id.isDeleted
+      );
 
-    const newUpdated = await courseModel.findByIdAndUpdate(
-      { _id: courseId },
-      {
-        $addToSet: {
-          preRequisiteCourses: {
-            $each: updateNewPreRequisiteCourses,
+      const newUpdated = await courseModel.findByIdAndUpdate(
+        { _id: courseId },
+        {
+          $addToSet: {
+            preRequisiteCourses: {
+              $each: updateNewPreRequisiteCourses,
+            },
           },
         },
-      },
-      {
-        new: true,
-      }
-    );
-  }
+        {
+          new: true,
+          session: session,
+        }
+      );
+    }
 
-  const result = await courseModel
-    .findById(courseId)
-    .populate("preRequisiteCourses.courseId");
-  return result;
+    const result = await courseModel
+      .findById(courseId)
+      .populate("preRequisiteCourses.courseId");
+    return result;
+  } catch (error) {
+    await session.abortTransaction();
+    await session.endSession();
+  }
 };
 const getSingleCourse = async (id: string) => {
   const result = await courseModel.findById(id);
@@ -91,10 +106,50 @@ const deleteCourse = async (courseId: string) => {
 
   return result;
 };
+
+const assignFaculty = async (
+  courseId: string,
+  payload: Partial<TCourseFaculty>
+) => {
+  const result = await courseFacultyModel.findByIdAndUpdate(
+    courseId,
+    {
+      course: courseId,
+      $addToSet: {
+        faculties: {
+          $each: payload,
+        },
+      },
+    },
+    {
+      new: true,
+      upsert: true,
+    }
+  );
+
+  return result;
+};
+
+const assingedFaculties = (query: Record<string, unknown>) => {
+  const result = new QueryBuilder(
+    courseFacultyModel.find({}).populate([
+      {
+        path: "course",
+      },
+      {
+        path: "faculties",
+      },
+    ]),
+    query
+  );
+  return result.modelQuery;
+};
 export const courseService = {
   createCourse,
   getAllCourse,
   updateCourse,
   deleteCourse,
   getSingleCourse,
+  assignFaculty,
+  assingedFaculties,
 };

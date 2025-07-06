@@ -29,7 +29,7 @@ const getAllFaculty = async (query: Record<string, unknown>) => {
     .sort()
     .fields()
     .paginate();
-  return result;
+  return result.modelQuery;
 };
 
 const singleFaculty = async (facultyId: string) => {
