@@ -4,6 +4,8 @@ import { searchableFields } from "./course.constant";
 import { TCourse, TCourseFaculty } from "./course.interface";
 import { courseFacultyModel, courseModel } from "./course.model";
 import path from "path";
+import AppError from "../../utils/AppError";
+import status from "http-status";
 
 const createCourse = async (courseData: TCourse) => {
   const result = await courseModel.create(courseData);
@@ -144,6 +146,26 @@ const assingedFaculties = (query: Record<string, unknown>) => {
   );
   return result.modelQuery;
 };
+
+const removeFaculties = async (courseId: String, payload: string[]) => {
+  const result = await courseFacultyModel.findByIdAndUpdate(
+    courseId,
+    {
+      $pull: {
+        faculties: {
+          $in: payload,
+        },
+      },
+    },
+    {
+      new: true,
+    }
+  );
+  if (!result) {
+    throw new AppError(status.BAD_REQUEST, "Failed to remove faculties");
+  }
+  return result;
+};
 export const courseService = {
   createCourse,
   getAllCourse,
@@ -152,4 +174,5 @@ export const courseService = {
   getSingleCourse,
   assignFaculty,
   assingedFaculties,
+  removeFaculties,
 };

@@ -17,5 +17,9 @@ courseRoutes.patch("/:courseId", courseController.updateCourse);
 courseRoutes.delete("/:courseId", courseController.deleteCourse);
 
 courseRoutes.put("/:courseId/assign-faculty", courseController.assignFaculty);
+courseRoutes.delete(
+  "/:courseId/remove-faculties",
+  courseController.removeFaculties
+);
 
 export default courseRoutes;
