@@ -17,4 +17,8 @@ semesterRegistrationRoutes.get(
   "/registered-semesters",
   semesterRegistrationController.getALLRegisteredSemester
 );
+semesterRegistrationRoutes.get(
+  "/:registeredSemesterId",
+  semesterRegistrationController.singleRegisteredSemester
+);
 export default semesterRegistrationRoutes;

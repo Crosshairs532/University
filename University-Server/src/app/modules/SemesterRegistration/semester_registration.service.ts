@@ -3,6 +3,7 @@ import AppError from "../../utils/AppError";
 import { AcademicSemester } from "../AcademicSemester/semester.model";
 import { TSemesterRegistration } from "./semester_registration.interface";
 import { semesterRegistrationModel } from "./semester_registration.model";
+import QueryBuilder from "../../builder/QueryBuilder";
 
 const createSemesterRegistration = async (payload: TSemesterRegistration) => {
   const academicSemester = payload?.academicSemester;
@@ -23,12 +24,30 @@ const createSemesterRegistration = async (payload: TSemesterRegistration) => {
   return result;
 };
 
-const getAllRegisteredSemester = async () => {
-  const result = await semesterRegistrationModel.find();
+const getAllRegisteredSemester = async (query: Record<string, unknown>) => {
+  const result = new QueryBuilder(
+    semesterRegistrationModel.find().populate("academicSemester"),
+    query
+  )
+    .filter()
+    .sort()
+    .fields()
+    .paginate();
+  return result.modelQuery;
+};
+const singleRegisteredSemester = async (id: string) => {
+  const result = await semesterRegistrationModel.findById(id);
+  if (!result) {
+    throw new AppError(status.BAD_REQUEST, "No semester found!");
+  }
+
   return result;
 };
+const updateSemesterRegistration = async () => {};
 
 export const semesterRegistrationService = {
   createSemesterRegistration,
   getAllRegisteredSemester,
+  updateSemesterRegistration,
+  singleRegisteredSemester,
 };
