@@ -4,8 +4,10 @@ import cors from "cors";
 import notFound from "./app/middlewares/not-found";
 import { globalErrorHandler } from "./app/middlewares/GlobalHandler";
 import router from "./app/routes";
+import cookieParser from "cookie-parser";
 const app = express();
 app.use(express.json());
+app.use(cookieParser());
 app.use(cors());
 app.get("/", (req: Request, res: Response) => {
   res.send("University Server");

@@ -15,7 +15,10 @@ authRouter.post(
 authRouter.post(
   "/change-password",
   auth("admin", "student", "faculty"),
-  schemaValidation(authValidation.changePasswordValidation)
+  schemaValidation(authValidation.changePasswordValidation),
+  authController.changePassword
 );
+
+authRouter.post("/refreshToken", authController.refreshToken);
 
 export default authRouter;

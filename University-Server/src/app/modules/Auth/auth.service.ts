@@ -108,7 +108,50 @@ const changePassword = async (currentUser: JwtPayload, payload: any) => {
   return result;
 };
 
+const refreshToken = async (token: string) => {
+  if (!token) {
+    throw new AppError(status.UNAUTHORIZED, "You are not authorized!");
+  }
+
+  const decoded = await jwt.verify(token, configFiles.jwt_secret as string);
+
+  if (!decoded) {
+    throw new AppError(status.UNAUTHORIZED, "You are not authorized!");
+  }
+
+  const { userId, iat } = decoded as JwtPayload;
+
+  const user = await userModel.isUserExist(userId);
+
+  if (!user) {
+    throw new AppError(status.NOT_FOUND, "This user is not found!");
+  }
+
+  // check if user is deleted or not
+  if (user?.isDeleted) {
+    throw new AppError(status.FORBIDDEN, "This user account Does not exist!");
+  }
+
+  if (userModel.JwtIssueCheck(user?.passwordChangedAt, iat as number)) {
+    throw new AppError(status.UNAUTHORIZED, "You are not unauthorized!");
+  }
+
+  const jwtPayload = {
+    userId: user?.id,
+    role: user?.role,
+  };
+
+  const accessToken = createToken(
+    jwtPayload,
+    configFiles.jwt_secret as string,
+    "2d" as string
+  );
+
+  return accessToken;
+};
+
 export const authService = {
   login,
   changePassword,
+  refreshToken,
 };

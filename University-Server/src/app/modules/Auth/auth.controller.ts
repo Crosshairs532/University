@@ -22,6 +22,7 @@ const changePassword = catchAsync(async (req, res) => {
     secure: configFiles.node_env == "production",
     httpOnly: true,
   });
+
   SendResponse(res, {
     success: true,
     message: "Password changed successfully",
@@ -31,7 +32,17 @@ const changePassword = catchAsync(async (req, res) => {
     },
   });
 });
+
+const refreshToken = catchAsync(async (req, res) => {
+  const result = await authService.refreshToken(req.cookies);
+  SendResponse(res, {
+    success: true,
+    message: "RefreshToken retrieved successfully",
+    data: result,
+  });
+});
 export const authController = {
   login,
   changePassword,
+  refreshToken,
 };

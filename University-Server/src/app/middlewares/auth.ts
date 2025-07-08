@@ -14,7 +14,7 @@ const auth = (...userRoles: string[]) => {
 
     const decoded = await jwt.verify(token, configFiles.jwt_secret as string);
 
-    if (!decode) {
+    if (!decoded) {
       throw new AppError(status.UNAUTHORIZED, "You are not authorized!");
     }
 
