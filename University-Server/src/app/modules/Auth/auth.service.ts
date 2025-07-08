@@ -2,12 +2,14 @@ import status from "http-status";
 import AppError from "../../utils/AppError";
 import { userModel } from "../user/user.model";
 import { TLogin } from "./auth.interface";
+import jwt from "jsonwebtoken";
+import { configFiles } from "../../config";
 const bcrypt = require("bcrypt");
 
 const login = async (loginData: TLogin) => {
   //check if admin user exist.
 
-  const isExist = await userModel.isUserExist(loginData.id);
+  const isExist = await userModel.isUserExist(loginData?.id);
 
   if (!isExist) {
     throw new AppError(status.NOT_FOUND, "This user is not found!");
@@ -31,6 +33,20 @@ const login = async (loginData: TLogin) => {
   if (!passwordMatched) {
     throw new AppError(status.UNAUTHORIZED, "Password is incorrect!");
   }
+
+  const jwtPayload = {
+    userId: isExist?.id,
+    role: isExist?.role,
+  };
+  const accessToken = jwt.sign(jwtPayload, configFiles.jwt_secret as string, {
+    algorithm: "RS256",
+    expiresIn: "2d",
+  });
+
+  return {
+    accessToken,
+    needPasswordChange: isExist?.needsPasswordChange,
+  };
 };
 
 export const authService = {
