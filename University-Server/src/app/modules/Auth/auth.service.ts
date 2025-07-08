@@ -4,6 +4,7 @@ import { userModel } from "../user/user.model";
 import { TLogin } from "./auth.interface";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { configFiles } from "../../config";
+import { createToken } from "../../utils/createToken";
 const bcrypt = require("bcrypt");
 
 const login = async (loginData: TLogin) => {
@@ -38,12 +39,21 @@ const login = async (loginData: TLogin) => {
     userId: isExist?.id,
     role: isExist?.role,
   };
-  const accessToken = jwt.sign(jwtPayload, configFiles.jwt_secret as string, {
-    expiresIn: "2d",
-  });
+
+  const accessToken = createToken(
+    jwtPayload,
+    configFiles.jwt_secret as string,
+    "2d" as string
+  );
+  const refreshToken = createToken(
+    jwtPayload,
+    configFiles.jwt_secret as string,
+    "365d" as string
+  );
 
   return {
     accessToken,
+    refreshToken,
     needPasswordChange: isExist?.needsPasswordChange,
   };
 };

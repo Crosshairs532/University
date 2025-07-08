@@ -3,6 +3,7 @@ import catchAsync from "../../utils/catchAsynch";
 import { SendResponse } from "../../utils/SendResponse";
 
 import { authService } from "./auth.service";
+import { configFiles } from "../../config";
 
 const login = catchAsync(async (req, res) => {
   const result = await authService.login(req.body);
@@ -14,10 +15,20 @@ const login = catchAsync(async (req, res) => {
 });
 const changePassword = catchAsync(async (req, res) => {
   const result = await authService.changePassword(req.user, req.body);
+  const { accessToken, refreshToken, needPasswordChange } =
+    result as JwtPayload;
+
+  res.cookie("refreshToken", refreshToken, {
+    secure: configFiles.node_env == "production",
+    httpOnly: true,
+  });
   SendResponse(res, {
     success: true,
     message: "Password changed successfully",
-    data: result,
+    data: {
+      accessToken,
+      needPasswordChange,
+    },
   });
 });
 export const authController = {
