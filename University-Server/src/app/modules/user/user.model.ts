@@ -1,6 +1,7 @@
 import { model, Schema } from "mongoose";
 import { TUser, UserModelType } from "./user.interface";
 import { configFiles } from "../../config";
+import { date } from "zod";
 const bcrypt = require("bcrypt");
 const userSchema = new Schema<TUser, UserModelType>(
   {
@@ -12,10 +13,14 @@ const userSchema = new Schema<TUser, UserModelType>(
     password: {
       type: String,
       required: true,
+      select: 0,
     },
     needsPasswordChange: {
       type: Boolean,
       default: true,
+    },
+    passwordChangedAt: {
+      type: Date,
     },
     role: {
       type: String,
@@ -60,12 +65,19 @@ userSchema.post("save", function (doc, next) {
 });
 
 userSchema.statics.isUserExist = async function (id: string) {
-  return userModel.findOne({ id });
+  return userModel.findOne({ id }).select("+password");
 };
 
 userSchema.statics.checkPassword = async function (loginPass, storedPass) {
   console.log(loginPass, storedPass);
   return await bcrypt.compare(loginPass, storedPass);
+};
+
+userSchema.statics.JwtIssueCheck = async function (
+  passwordChangeDate,
+  issueDate
+) {
+  return new Date(passwordChangeDate).getTime() / 1000 > issueDate;
 };
 
 export const userModel = model<TUser, UserModelType>("User", userSchema);
