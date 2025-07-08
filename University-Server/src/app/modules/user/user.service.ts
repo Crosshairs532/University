@@ -10,6 +10,10 @@ import AppError from "../../utils/AppError";
 import { generateStudentId } from "./utils/generateStudentId";
 import { generateFacultyID } from "./utils/generateFacultyId";
 import { facultyModel } from "../Faculty/faculty.model";
+import { TAdmin } from "../Admin/admin.interface";
+import { generateAdminID } from "./utils/genearateAdminId";
+import status from "http-status";
+import { Admin } from "../Admin/admin.model";
 
 const createStudentDB = async (password: string, studentData: any) => {
   const user: Partial<TUser> = {};
@@ -80,8 +84,54 @@ const createFaculty = async (password: string, facultyData: any) => {
     await session.endSession();
   }
 };
+const createAdmin = async (password: string, payload: TAdmin) => {
+  // create a user object
+  const userData: Partial<TUser> = {};
+
+  //if password is not given , use deafult password
+  userData.password = password || (configFiles.default_password as string);
+
+  //set admin role
+  userData.role = "admin";
+
+  const session = await mongoose.startSession();
+
+  try {
+    session.startTransaction();
+    //set  generated id
+    userData.id = await generateAdminID();
+
+    // create a user (transaction-1)
+    const newUser = await userModel.create([userData], { session });
+
+    //create a admin
+    if (!newUser.length) {
+      throw new AppError(status.BAD_REQUEST, "Failed to create admin");
+    }
+    // set id , _id as user
+    payload.id = newUser[0].id;
+    payload.user = newUser[0]._id; //reference _id
+
+    // create a admin (transaction-2)
+    const newAdmin = await Admin.create([payload], { session });
+
+    if (!newAdmin.length) {
+      throw new AppError(status.BAD_REQUEST, "Failed to create admin");
+    }
+
+    await session.commitTransaction();
+    await session.endSession();
+
+    return newAdmin;
+  } catch (err: any) {
+    await session.abortTransaction();
+    await session.endSession();
+    throw new Error(err);
+  }
+};
 
 export const userService = {
   createStudentDB,
   createFaculty,
+  createAdmin,
 };

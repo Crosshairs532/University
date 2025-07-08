@@ -4,6 +4,7 @@ import { studentValidationSchemas } from "../student/student.validation";
 
 import schemaValidation from "../../middlewares/validateRequest";
 import { facultyValidations } from "../Faculty/faculty.validation";
+import { createAdminValidationSchema } from "../Admin/admin.validation";
 const userRoutes = express.Router();
 
 // validation schemas using zod
@@ -16,6 +17,11 @@ userRoutes.post(
 userRoutes.post(
   "/create-faculty",
   schemaValidation(facultyValidations.createFacultyValidationSchema),
+  userController.createFaculty
+);
+userRoutes.post(
+  "/create-admin",
+  schemaValidation(createAdminValidationSchema),
   userController.createFaculty
 );
 

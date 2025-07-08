@@ -3,12 +3,13 @@ import { userModel } from "../user.model";
 
 const lastFaculty = async () => {
   const lastFaculty = await userModel
-    .find(
+    .findOne(
       {
         role: "faculty",
       },
       {
         id: 1,
+        _id: 0,
       }
     )
     .sort({
@@ -16,7 +17,7 @@ const lastFaculty = async () => {
     })
     .lean();
 
-  return lastFaculty?.id ? lastFaculty.id : undefined;
+  return lastFaculty?.id ? lastFaculty.id.substring(2) : undefined;
 };
 
 export const generateFacultyID = async () => {
