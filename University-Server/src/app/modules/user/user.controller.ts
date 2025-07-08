@@ -39,4 +39,4 @@ const createAdmin = catchAsync(async (req, res) => {
     data: result,
   });
 });
-export const userController = { createStudent, createFaculty };
+export const userController = { createStudent, createFaculty, createAdmin };

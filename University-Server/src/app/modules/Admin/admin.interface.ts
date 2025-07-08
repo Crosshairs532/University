@@ -1,6 +1,6 @@
 import { Model, Types } from "mongoose";
 
-export type TGender = "male" | "female" | "other";
+export type TGender = "MALE" | "FEMALE";
 export type TBloodGroup =
   | "A+"
   | "A-"

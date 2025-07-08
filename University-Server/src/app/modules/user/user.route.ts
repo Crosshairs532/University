@@ -22,7 +22,7 @@ userRoutes.post(
 userRoutes.post(
   "/create-admin",
   schemaValidation(createAdminValidationSchema),
-  userController.createFaculty
+  userController.createAdmin
 );
 
 export default userRoutes;
