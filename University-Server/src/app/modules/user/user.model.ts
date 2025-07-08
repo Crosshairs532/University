@@ -64,6 +64,7 @@ userSchema.statics.isUserExist = async function (id: string) {
 };
 
 userSchema.statics.checkPassword = async function (loginPass, storedPass) {
+  console.log(loginPass, storedPass);
   return await bcrypt.compare(loginPass, storedPass);
 };
 

@@ -26,8 +26,8 @@ const login = async (loginData: TLogin) => {
   }
 
   const passwordMatched = await userModel.checkPassword(
-    isExist?.password,
-    loginData.password
+    loginData.password,
+    isExist?.password
   );
 
   if (!passwordMatched) {
@@ -39,7 +39,6 @@ const login = async (loginData: TLogin) => {
     role: isExist?.role,
   };
   const accessToken = jwt.sign(jwtPayload, configFiles.jwt_secret as string, {
-    algorithm: "RS256",
     expiresIn: "2d",
   });
 

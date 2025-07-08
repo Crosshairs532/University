@@ -4,7 +4,7 @@ import auth from "../../middlewares/auth";
 
 const studentRoutes = express.Router();
 
-studentRoutes.get("/", auth(), studentController.getAllStudents);
+studentRoutes.get("/", auth("admin"), studentController.getAllStudents);
 studentRoutes.get("/:studentId", studentController.getSingleStudent);
 studentRoutes.delete("/:studentId", studentController.deleteStudent);
 
