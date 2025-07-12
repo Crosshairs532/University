@@ -183,9 +183,44 @@ const forgetPassword = async (id: string) => {
   sendEmail(url);
 };
 
+const resetPassword = async (
+  token: string,
+  newPasswordData: { id: string; newPassword: string }
+) => {
+  const { id, newPassword } = newPasswordData;
+
+  const user = await userModel.isUserExist(id);
+
+  if (!user) {
+    throw new AppError(status.NOT_FOUND, "This user is not found!");
+  }
+
+  // check if user is deleted or not
+  if (user?.isDeleted) {
+    throw new AppError(status.FORBIDDEN, "This user account Does not exist!");
+  }
+  const decoded = await jwt.verify(token, configFiles.jwt_secret as string);
+
+  if (decoded?.userId !== id) {
+    throw new AppError(status.FORBIDDEN, "Access Denied!");
+  }
+
+  const hashPass = await bcrypt.hash(
+    newPassword,
+    Number(configFiles.bcrypt_salt_rounds)
+  );
+
+  const result = await userModel.findByIdAndUpdate(id, {
+    password: hashPass,
+  });
+
+  return result;
+};
+
 export const authService = {
   login,
   changePassword,
   refreshToken,
   forgetPassword,
+  resetPassword,
 };
