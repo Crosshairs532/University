@@ -5,6 +5,7 @@ import { TLogin } from "./auth.interface";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { configFiles } from "../../config";
 import { createToken } from "../../utils/createToken";
+import sendEmail from "../../utils/sendEmail";
 const bcrypt = require("bcrypt");
 
 const login = async (loginData: TLogin) => {
@@ -150,8 +151,41 @@ const refreshToken = async (token: string) => {
   return accessToken;
 };
 
+const forgetPassword = async (id: string) => {
+  const user = await userModel.isUserExist(id);
+
+  if (!user) {
+    throw new AppError(status.NOT_FOUND, "This user is not found!");
+  }
+
+  // check if user is deleted or not
+  if (user?.isDeleted) {
+    throw new AppError(status.FORBIDDEN, "This user account Does not exist!");
+  }
+
+  // check is user status
+  if (user?.status == "blocked") {
+    throw new AppError(status.FORBIDDEN, "This user account has been blocked!");
+  }
+  const jwtPayload = {
+    userId: id,
+    role: user?.role,
+  };
+
+  const accessToken = createToken(
+    jwtPayload,
+    configFiles.jwt_secret as string,
+    "10m" as string
+  );
+
+  const url = `http://localhost:3000?id=${id}&token=${accessToken}`;
+
+  sendEmail(url);
+};
+
 export const authService = {
   login,
   changePassword,
   refreshToken,
+  forgetPassword,
 };
