@@ -17,3 +17,5 @@ export interface UserModelType extends Model<TUser> {
   checkPassword(loginPass: string, storedPass: string): Promise<boolean>;
   JwtIssueCheck(passwordChange: Date, issueDate: number): boolean;
 }
+
+export type Role = "student" | "faculty" | "admin";

@@ -6,6 +6,7 @@ import jwt, { JwtPayload } from "jsonwebtoken";
 import { configFiles } from "../../config";
 import { createToken } from "../../utils/createToken";
 import sendEmail from "../../utils/sendEmail";
+import verifyToken from "./auth.utils";
 const bcrypt = require("bcrypt");
 
 const login = async (loginData: TLogin) => {
@@ -199,7 +200,7 @@ const resetPassword = async (
   if (user?.isDeleted) {
     throw new AppError(status.FORBIDDEN, "This user account Does not exist!");
   }
-  const decoded = await jwt.verify(token, configFiles.jwt_secret as string);
+  const decoded = verifyToken(token);
 
   if (decoded?.userId !== id) {
     throw new AppError(status.FORBIDDEN, "Access Denied!");

@@ -1,10 +1,9 @@
 import { AcademicSemester } from "./../AcademicSemester/semester.model";
 import { configFiles } from "../../config";
 import { studentModel } from "../student/student.model";
-import { TUser } from "./user.interface";
+import { Role, TUser } from "./user.interface";
 
 import { userModel } from "./user.model";
-import { TAcademicSemester } from "../AcademicSemester/semester.interface";
 import mongoose from "mongoose";
 import AppError from "../../utils/AppError";
 import { generateStudentId } from "./utils/generateStudentId";
@@ -14,8 +13,15 @@ import { TAdmin } from "../Admin/admin.interface";
 import { generateAdminID } from "./utils/genearateAdminId";
 import status from "http-status";
 import { Admin } from "../Admin/admin.model";
+import verifyToken from "../Auth/auth.utils";
+import { JwtPayload } from "jsonwebtoken";
+import { Cloudinary } from "../../utils/Cloudinary";
 
-const createStudentDB = async (password: string, studentData: any) => {
+const createStudentDB = async (
+  file: any,
+  password: string,
+  studentData: any
+) => {
   const user: Partial<TUser> = {};
   // create user
   user.password = password || (configFiles.default_password as string);
@@ -31,6 +37,11 @@ const createStudentDB = async (password: string, studentData: any) => {
   try {
     session.startTransaction();
     user.id = (await generateStudentId(academicSemester!)) as string;
+
+    const imageName = `${user.id}-${studentData.name.firstName}`;
+    const path = file?.path;
+    const { secure_url } = await Cloudinary(imageName, path);
+
     const result = await userModel.create([user], { session });
     // create student
     if (!result.length) {
@@ -38,6 +49,8 @@ const createStudentDB = async (password: string, studentData: any) => {
     }
     studentData.userId = result[0]._id;
     studentData.id = result[0].id;
+    studentData.profileImg = secure_url;
+
     const student = await studentModel.create([studentData], { session });
 
     if (!student) {
@@ -133,8 +146,33 @@ const createAdmin = async (password: string, payload: TAdmin) => {
   }
 };
 
+const getMe = async (token: string) => {
+  const { userId, role } = (await verifyToken(token)) as JwtPayload;
+  let result = null;
+  if (role == "student") {
+    result = await studentModel?.findOne({ id: userId });
+  }
+  if (role == "faculty") {
+    result = await facultyModel?.findOne({ id: userId });
+  }
+  if (role == "admin") {
+    result = await Admin?.findOne({ id: userId });
+  }
+
+  return result;
+};
+
+const changeStatus = async (id: string, payload: any) => {
+  const result = await userModel.findByIdAndUpdate(id, payload, {
+    new: true,
+  });
+  return result;
+};
+
 export const userService = {
   createStudentDB,
   createFaculty,
   createAdmin,
+  getMe,
+  changeStatus,
 };

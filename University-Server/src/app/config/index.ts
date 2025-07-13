@@ -7,4 +7,9 @@ export const configFiles = {
   bcrypt_salt_rounds: process.env.BCRYPT_SALT_ROUNDS,
   default_password: process.env.DEFAULT_PASSWORD,
   jwt_secret: process.env.JWT_SECRET,
+  cloudinary: {
+    cloudinary_name: process.env.CLOUDINARY_NAME,
+    cloudinary_api: process.env.CLOUDINARY_KEY,
+    cloudinary_secret: process.env.CLOUDINARY_SECRET,
+  },
 };
