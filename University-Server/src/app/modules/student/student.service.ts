@@ -23,7 +23,11 @@ const getAllStudentsDB = async (query: Record<string, unknown>) => {
     .fields();
 
   const result = await studentQuery.modelQuery;
-  return result;
+  const meta = await studentQuery.countTotal();
+  return {
+    result,
+    meta,
+  };
 
   // if (query.searchTerm) {
   //   searchTerm = query?.searchTerm as string;
