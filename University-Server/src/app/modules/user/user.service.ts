@@ -57,17 +57,17 @@ const createStudentDB = async (
   try {
     session.startTransaction();
     user.id = (await generateStudentId(academicSemester!)) as string;
-    console.log(file);
+    // console.log(file);
     if (file) {
-      console.log(file);
+      // console.log(file);
       const imageName = `${user.id}-${studentData.name.firstName}`;
       const path = file?.path;
-      console.log("cloudinary...");
+      // console.log("cloudinary...");
       const { secure_url } = await Cloudinary(imageName, path);
-      console.log("cloudinary Done");
+      // console.log("cloudinary Done");
       studentData.profileImage = secure_url;
     }
-    console.log("user creating...");
+    // console.log("user creating...");
 
     // console.log(studentData);
 
@@ -96,7 +96,7 @@ const createStudentDB = async (
   }
 };
 
-const createFaculty = async (password: string, facultyData: any) => {
+const createFaculty = async (file, password: string, facultyData: any) => {
   const user: Partial<TUser> = {};
   user.role = "faculty";
   user.password = password || configFiles.default_password;
@@ -107,14 +107,30 @@ const createFaculty = async (password: string, facultyData: any) => {
   try {
     await session.startTransaction();
     user.id = (await generateFacultyID()) as unknown as string;
-
+    if (file) {
+      // console.log(file);
+      const imageName = `${user.id}-${facultyData.name.firstName}`;
+      const path = file?.path;
+      // console.log("cloudinary...");
+      const { secure_url } = await Cloudinary(imageName, path);
+      // console.log("cloudinary Done");
+      facultyData.profileImage = secure_url;
+    }
     const facultyUser = await userModel.create([user], { session });
 
     if (!facultyUser.length) {
       throw new AppError(500, "Failed to create faculty user!");
     }
+    const academicDepartment = await academicDepartmentModel.findById(
+      facultyData.academicDepartment
+    );
+
+    if (!academicDepartment) {
+      throw new AppError(status.NOT_FOUND, "No Academic Department found!");
+    }
     facultyData.id = user.id;
     facultyData.userId = facultyUser[0]._id;
+    facultyData.academicFaculty = academicDepartment.academicFaculty;
 
     const faculty = await facultyModel.create([facultyData], { session });
 
@@ -123,12 +139,14 @@ const createFaculty = async (password: string, facultyData: any) => {
     }
     await session.commitTransaction();
     await session.endSession();
+
+    return faculty;
   } catch {
     await session.abortTransaction();
     await session.endSession();
   }
 };
-const createAdmin = async (password: string, payload: TAdmin) => {
+const createAdmin = async (file, password: string, payload: TAdmin) => {
   // create a user object
   const userData: Partial<TUser> = {};
 
@@ -145,7 +163,15 @@ const createAdmin = async (password: string, payload: TAdmin) => {
     session.startTransaction();
     //set  generated id
     userData.id = await generateAdminID();
-
+    if (file) {
+      // console.log(file);
+      const imageName = `${userData.id}-${payload.name.firstName}`;
+      const path = file?.path;
+      // console.log("cloudinary...");
+      const { secure_url } = await Cloudinary(imageName, path);
+      // console.log("cloudinary Done");
+      payload.profileImage = secure_url as string;
+    }
     // create a user (transaction-1)
     const newUser = await userModel.create([userData], { session });
 
@@ -153,6 +179,10 @@ const createAdmin = async (password: string, payload: TAdmin) => {
     if (!newUser.length) {
       throw new AppError(status.BAD_REQUEST, "Failed to create admin");
     }
+
+    if (file) {
+    }
+
     // set id , _id as user
     payload.id = newUser[0].id;
     payload.user = newUser[0]._id; //reference _id

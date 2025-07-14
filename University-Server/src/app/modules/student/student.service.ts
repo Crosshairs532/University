@@ -6,7 +6,12 @@ import QueryBuilder from "../../builder/QueryBuilder";
 
 const getAllStudentsDB = async (query: Record<string, unknown>) => {
   const excludeFields = ["searchTerm", "sort", "limit", "page", "fields"];
-  const searchTerms = ["email", "name.firstName", "presentAddress"];
+  const searchTerms = [
+    "email",
+    "name.firstName",
+    "name.lastName",
+    "presentAddress",
+  ];
   const studentQuery = new QueryBuilder(
     studentModel.find().populate({
       path: "academicDepartment",
@@ -88,7 +93,7 @@ const getAllStudentsDB = async (query: Record<string, unknown>) => {
 };
 
 const getSingleStudent = async (studentId: any) => {
-  const result = await studentModel.findOne({ id: studentId }).populate({
+  const result = await studentModel.findById(studentId).populate({
     path: "academicDepartment",
     populate: {
       path: "academicFaculty",

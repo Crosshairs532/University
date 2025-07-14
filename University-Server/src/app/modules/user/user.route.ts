@@ -13,7 +13,7 @@ const userRoutes = express.Router();
 // validation schemas using zod
 userRoutes.post(
   "/create-student",
-
+  auth("super-admin", "admin"),
   upload.single("file"),
   (req, res, next) => {
     req.body = JSON.parse(req.body.data);
@@ -26,11 +26,23 @@ userRoutes.post(
 
 userRoutes.post(
   "/create-faculty",
+  auth("super-admin", "admin"),
+  upload.single("file"),
+  (req, res, next) => {
+    req.body = JSON.parse(req.body.data);
+    next();
+  },
   schemaValidation(facultyValidations.createFacultyValidationSchema),
   userController.createFaculty
 );
 userRoutes.post(
   "/create-admin",
+  auth("super-admin", "admin"),
+  upload.single("file"),
+  (req, res, next) => {
+    req.body = JSON.parse(req.body.data);
+    next();
+  },
   schemaValidation(createAdminValidationSchema),
   userController.createAdmin
 );
@@ -43,7 +55,7 @@ userRoutes.get(
 
 userRoutes.post(
   "/change-status/:id",
-  auth("admin"),
+  auth("super-admin", "admin"),
   userController.changeStatus
 );
 

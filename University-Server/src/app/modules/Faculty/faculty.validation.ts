@@ -28,7 +28,7 @@ const createFacultyValidationSchema = z.object({
       bloodGroup: z.enum(["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"]),
       presentAddress: z.string(),
       permanentAddress: z.string(),
-      profileImage: z.string(),
+      profileImage: z.string().optional(),
       academicDepartment: z.string({
         required_error: "Academic Department Id is required",
       }),

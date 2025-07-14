@@ -34,7 +34,6 @@ const facultySchema = new Schema<TFaculty>(
       require: [true, "Designation is required"],
     },
     name: userNameSchema,
-
     gender: {
       type: String,
       enum: ["MALE", "FEMALE"],
