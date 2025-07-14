@@ -40,7 +40,7 @@ const StudentSchema = new Schema<TStudent>(
     permanentAddress: { type: String, required: true },
     guardian: { type: GuardianSchema, required: true },
     localGuardian: { type: LocalGuardianSchema, required: true },
-    profileImage: { type: String },
+    profileImage: { type: String, default: "" },
     admissionSemester: {
       type: Schema.Types.ObjectId,
       ref: "AcademicSemester",
@@ -48,6 +48,10 @@ const StudentSchema = new Schema<TStudent>(
     academicDepartment: {
       type: Schema.Types.ObjectId,
       ref: "academicDepartment",
+    },
+    academicFaculty: {
+      type: Schema.Types.ObjectId,
+      ref: "AcademicFaculty",
     },
     isDeleted: { type: Boolean, default: false },
   },

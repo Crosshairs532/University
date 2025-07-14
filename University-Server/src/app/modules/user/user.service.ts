@@ -16,6 +16,7 @@ import { Admin } from "../Admin/admin.model";
 import verifyToken from "../Auth/auth.utils";
 import { JwtPayload } from "jsonwebtoken";
 import { Cloudinary } from "../../utils/Cloudinary";
+import { academicDepartmentModel } from "../AcademicDepartment/academicDepartment.model";
 
 const createStudentDB = async (
   file: any,
@@ -32,15 +33,43 @@ const createStudentDB = async (
     studentData.admissionSemester
   );
 
+  if (!academicSemester) {
+    throw new AppError(status.NOT_FOUND, "No Academic Semester found!");
+  }
+
+  const academicDepartment = await academicDepartmentModel.findById(
+    studentData.academicDepartment
+  );
+
+  if (!academicDepartment) {
+    throw new AppError(status.NOT_FOUND, "No Academic Department found!");
+  }
+
+  if (academicDepartment.academicFaculty._id != studentData.academicFaculty) {
+    throw new AppError(
+      status.NOT_FOUND,
+      "No Academic Department exist on selected Academic Faculty!"
+    );
+  }
+
   const session = await mongoose.startSession();
 
   try {
     session.startTransaction();
     user.id = (await generateStudentId(academicSemester!)) as string;
+    console.log(file);
+    if (file) {
+      console.log(file);
+      const imageName = `${user.id}-${studentData.name.firstName}`;
+      const path = file?.path;
+      console.log("cloudinary...");
+      const { secure_url } = await Cloudinary(imageName, path);
+      console.log("cloudinary Done");
+      studentData.profileImage = secure_url;
+    }
+    console.log("user creating...");
 
-    const imageName = `${user.id}-${studentData.name.firstName}`;
-    const path = file?.path;
-    const { secure_url } = await Cloudinary(imageName, path);
+    // console.log(studentData);
 
     const result = await userModel.create([user], { session });
     // create student
@@ -49,8 +78,8 @@ const createStudentDB = async (
     }
     studentData.userId = result[0]._id;
     studentData.id = result[0].id;
-    studentData.profileImg = secure_url;
-
+    studentData.academicFaculty = academicDepartment.academicFaculty;
+    console.log("student creating...");
     const student = await studentModel.create([studentData], { session });
 
     if (!student) {

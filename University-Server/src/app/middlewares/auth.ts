@@ -30,10 +30,6 @@ const auth = (...userRoles: string[]) => {
     if (user?.isDeleted) {
       throw new AppError(status.FORBIDDEN, "This user account Does not exist!");
     }
-
-    if (userModel.JwtIssueCheck(user?.passwordChangedAt, iat as number)) {
-      throw new AppError(status.UNAUTHORIZED, "You are not unauthorized!");
-    }
     if (userRoles && !userRoles.includes((decoded as JwtPayload).role)) {
       throw new AppError(status.UNAUTHORIZED, "You are not unauthorized!");
     }

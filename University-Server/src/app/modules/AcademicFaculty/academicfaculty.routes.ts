@@ -2,11 +2,13 @@ import { Router } from "express";
 import { academicFacultyController } from "./academicfaculty.controller";
 import schemaValidation from "../../middlewares/validateRequest";
 import { academicFacultyValidation } from "./academicfaculty.validation";
+import auth from "../../middlewares/auth";
 
 const AcademicFacultyRoutes = Router();
 
 AcademicFacultyRoutes.post(
   "/create-academic-faculty",
+  auth("super-admin", "admin"),
   schemaValidation(academicFacultyValidation.createAcademicFacultySchema),
   academicFacultyController.createAcademicFaculty
 );

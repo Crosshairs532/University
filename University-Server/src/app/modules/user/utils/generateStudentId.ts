@@ -6,15 +6,16 @@ const findLastStudent = async () => {
     .findOne({
       role: "student",
     })
+    .sort({
+      createdAt: -1,
+    })
     .select({
       id: 1,
       _id: 0,
     })
-    .sort({
-      createdAt: -1,
-    }).lean;
+    .lean();
 
-  return lastStudent?.id ? lastStudent.id : undefined;
+  return lastStudent?.id ? lastStudent?.id : undefined;
 };
 
 export const generateStudentId = async (
@@ -23,6 +24,7 @@ export const generateStudentId = async (
   let currentId = (0).toString(); // 0000 by default
 
   const lastStudentId = await findLastStudent();
+
   // 2030 01 0001
 
   if (lastStudentId) {

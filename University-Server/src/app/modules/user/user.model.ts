@@ -49,13 +49,9 @@ const userSchema = new Schema<TUser, UserModelType>(
 
 // hash password before saving
 userSchema.pre("save", async function (next) {
-  console.log("Pre middleware");
-  console.log(this);
   const user = this;
   try {
     const hash = await bcrypt.hash(user.password, 12);
-
-    console.log({ hash });
     user.password = hash;
   } catch (err: any) {
     next(err);
@@ -64,8 +60,6 @@ userSchema.pre("save", async function (next) {
 
 userSchema.post("save", function (doc, next) {
   doc.password = "";
-
-  console.log({ doc });
   next();
 });
 

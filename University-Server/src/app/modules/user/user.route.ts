@@ -7,15 +7,16 @@ import { facultyValidations } from "../Faculty/faculty.validation";
 import { createAdminValidationSchema } from "../Admin/admin.validation";
 import auth from "../../middlewares/auth";
 import { upload } from "../../utils/Cloudinary";
+
 const userRoutes = express.Router();
 
 // validation schemas using zod
 userRoutes.post(
   "/create-student",
+
   upload.single("file"),
   (req, res, next) => {
     req.body = JSON.parse(req.body.data);
-
     next();
   },
 
