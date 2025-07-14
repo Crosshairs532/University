@@ -1,6 +1,7 @@
 import { Server } from "http";
 import { configFiles } from "./app/config";
 import app from "./app";
+import superAdmin from "./app/DB";
 
 // getting-started.js
 const mongoose = require("mongoose");
@@ -11,6 +12,8 @@ let server: Server;
 async function main() {
   const { port, url } = configFiles;
   await mongoose.connect(url as string);
+
+  superAdmin();
   server = app.listen(port, () => {
     console.log(`University server is listening on port ${port}`);
   });

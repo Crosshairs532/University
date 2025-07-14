@@ -12,4 +12,7 @@ export const configFiles = {
     cloudinary_api: process.env.CLOUDINARY_KEY,
     cloudinary_secret: process.env.CLOUDINARY_SECRET,
   },
+  superAdmin: {
+    super_admin_pass: process.env.SUPER_ADMIN_PASSWORD,
+  },
 };
