@@ -7,7 +7,7 @@ const createUserNameValidationSchema = z.object({
   lastName: z.string().max(20),
 });
 
-export const createAdminValidationSchema = z.object({
+const createAdminValidationSchema = z.object({
   body: z.object({
     password: z.string().max(20),
     admin: z.object({
@@ -21,7 +21,7 @@ export const createAdminValidationSchema = z.object({
       bloodGroup: z.enum([...BloodGroup] as [string, ...string[]]),
       presentAddress: z.string(),
       permanentAddress: z.string(),
-      profileImage: z.string(),
+      profileImage: z.string().optional(),
     }),
   }),
 });

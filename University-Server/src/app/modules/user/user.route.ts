@@ -4,7 +4,7 @@ import { studentValidationSchemas } from "../student/student.validation";
 
 import schemaValidation from "../../middlewares/validateRequest";
 import { facultyValidations } from "../Faculty/faculty.validation";
-import { createAdminValidationSchema } from "../Admin/admin.validation";
+import { AdminValidations } from "../Admin/admin.validation";
 import auth from "../../middlewares/auth";
 import { upload } from "../../utils/Cloudinary";
 
@@ -43,7 +43,7 @@ userRoutes.post(
     req.body = JSON.parse(req.body.data);
     next();
   },
-  schemaValidation(createAdminValidationSchema),
+  schemaValidation(AdminValidations.createAdminValidationSchema),
   userController.createAdmin
 );
 

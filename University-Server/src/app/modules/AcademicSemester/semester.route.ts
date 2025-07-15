@@ -17,10 +17,18 @@ router.post(
 
 router.get(
   "/all-academic-semester",
+  auth("super-admin", "admin", "student", "faculty"),
   AcademicSemesterController.getAllAcademicSemester
 );
 router.get(
   "/:singleSemesterId",
+  auth("super-admin", "admin", "student", "faculty"),
+  AcademicSemesterController.getSingleAcademicSemester
+);
+
+router.patch(
+  "/:singleSemesterId",
+  auth("super-admin", "admin"),
   AcademicSemesterController.getSingleAcademicSemester
 );
 

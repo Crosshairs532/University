@@ -23,13 +23,16 @@ const createSemesterRegistration = async (payload: TSemesterRegistration) => {
 
   const isUpcomingOrOngoing = await semesterRegistrationModel.findOne({
     status: {
-      $or: [
-        {
-          status: "UPCOMING",
-        },
-        {
-          status: "ONGOING",
-        },
+      $in: [
+        "UPCOMING",
+
+        "ONGOING",
+        // {
+        //   status: "UPCOMING",
+        // },
+        // {
+        //   status: "ONGOING",
+        // },
       ],
     },
   });
@@ -83,7 +86,7 @@ const updateSemesterRegistration = async (
   ) {
     throw new AppError(
       status.BAD_REQUEST,
-      `Already this semester is ${registeredSemester.status}`
+      `This semester is already ${registeredSemester.status}`
     );
   }
   if (registeredSemester.status == "ONGOING" && payload.status == "UPCOMING") {
