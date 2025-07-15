@@ -147,6 +147,17 @@ const assingedFaculties = (query: Record<string, unknown>) => {
   return result.modelQuery;
 };
 
+const getCourseFaculties = async (courseId: string) => {
+  const courseExist = await courseFacultyModel
+    .findById(courseId)
+    .populate("faculties");
+
+  if (!courseExist) {
+    throw new AppError(status.NOT_FOUND, "No Course found!");
+  }
+  return courseExist;
+};
+
 const removeFaculties = async (courseId: String, payload: string[]) => {
   const result = await courseFacultyModel.findByIdAndUpdate(
     courseId,
@@ -175,4 +186,5 @@ export const courseService = {
   assignFaculty,
   assingedFaculties,
   removeFaculties,
+  getCourseFaculties,
 };

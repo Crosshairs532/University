@@ -43,6 +43,11 @@ courseRoutes.put(
   auth("admin", "super-admin"),
   courseController.assignFaculty
 );
+
+courseRoutes.get(
+  "/:courseId/get-faculties",
+  courseController.getCourseFaculties
+);
 courseRoutes.delete(
   "/:courseId/remove-faculties",
   auth("admin", "super-admin"),
